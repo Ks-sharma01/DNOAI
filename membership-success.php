@@ -71,6 +71,10 @@ $applicationNo =
     </div>
 
 </div>
+<script>
+        sessionStorage.removeItem("membershipFormData");
+        sessionStorage.removeItem("membershipFormStep");
+</script>
 
 <?php
 include __DIR__ . "/includes/footer.php";

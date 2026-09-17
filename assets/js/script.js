@@ -371,7 +371,10 @@ window.addEventListener("hashchange", openSectionFromHash);
 
 // membership form
 
-let currentStep = 0;
+
+const stepStorageKey = "membershipFormStep"
+
+let currentStep = parseInt(sessionStorage.getItem(stepStorageKey) || "0", 10)
 
 const steps = document.querySelectorAll(".form-step");
 const progressBar = document.getElementById("progressBar");
@@ -383,7 +386,7 @@ const submitBtn = document.getElementById("submitBtn");
 
 
 function showStep(step) {
-
+    sessionStorage.setItem(stepStorageKey, step);
     steps.forEach((item, index) => {
         item.classList.toggle(
             "active",
@@ -449,6 +452,67 @@ function showStep(step) {
 const membershipForm = document.getElementById("membershipForm");
 
 if (membershipForm) {
+    const storageKey = "membershipFormData";
+
+    function saveFormData() {
+        const data = {};
+
+        membershipForm.querySelectorAll("input, select, textarea").forEach(field => {
+            if(field.type === "file"){
+                return; // Skip file inputs
+            }
+
+            if (field.type === "radio") {
+                if(field.checked) {
+                    data[field.name] = field.value;
+                }
+                return;
+            }
+
+            if(field.type === "checkbox") {
+                if(!data[field.name]) {
+                    data[field.name] = [];
+                }
+                if(field.checked) {
+                    data[field.name].push(field.value);
+                }
+                return;
+            }
+
+            data[field.name] = field.value;
+        });
+
+        sessionStorage.setItem(storageKey, JSON.stringify(data));
+    }
+
+    function restoreFormData() {
+        const savedData = sessionStorage.getItem(storageKey);
+        if(!savedData) return;
+
+        const data = JSON.parse(savedData);
+
+        membershipForm.querySelectorAll("input, select, textarea").forEach(field => {
+            if(field.type === "file"){
+                return;
+            }
+
+            if(field.type === "radio"){
+                field.checked = data[field.name] === field.value;
+                return;
+            }
+
+            if(field.type === "checkbox"){
+                const values = data[field.name] || [];
+                field.checked = values.includes(field.value);
+                return;
+            }
+
+            if(data[field.name] !== undefined){
+                field.value = data[field.name];
+            }
+        })
+    }
+
 
 
     const legal_Name = document.getElementById("legal_name_network");
@@ -1192,6 +1256,7 @@ if (membershipForm) {
         // If No, no textarea validation
         if (selected.value === "No") {
             detailsError.textContent = "";
+            details.value = "";
         }
 
         return true;
@@ -1241,6 +1306,7 @@ if (membershipForm) {
         // If Membership category, no textarea validation
         if (selected.value === "MSO Member" || selected.value === "Associate") {
             other_category_err.textContent = "";
+            other_category.value = "";
         }
 
         return true;
@@ -1608,6 +1674,18 @@ if (membershipForm) {
             validateSignatoryPlace()
         );
     }
+
+      // Save whenever user changes something
+    membershipForm.addEventListener("input", function () {
+        saveFormData();
+    });
+
+    membershipForm.addEventListener("change", function () {
+        saveFormData();
+    });
+            
+        // Restore data when page loads
+        restoreFormData();
 
     // CHANGE STEP
 

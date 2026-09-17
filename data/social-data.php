@@ -27,7 +27,7 @@ $twitter_posts = [
 
 
 $linkedin_profile = [
-    'name' => 'Digital Network Operator Association of India (DNOAI)',
+    'name' => 'Digital Network Operators Association of India (DNOAI)',
     'followers' => '',
     'description' => "Connecting India, Empowering Digital Networks!",
     'website' => 'https://dnoai.in/',
