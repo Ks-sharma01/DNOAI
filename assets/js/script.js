@@ -34,7 +34,26 @@ function openSectionFromHash() {
     collapse.show();
 }
 
-document.addEventListener("DOMContentLoaded", openSectionFromHash);
+document.addEventListener("DOMContentLoaded", function () {
+    openSectionFromHash();
+
+    document.querySelectorAll('a[href*="#"]').forEach(function (link) {
+        link.addEventListener("click", function () {
+            const url = new URL(link.href, window.location.href);
+
+            if (
+                url.pathname !== window.location.pathname ||
+                url.search !== window.location.search ||
+                !url.hash
+            ) {
+                return;
+            }
+
+            // A click on the current hash does not emit a hashchange event.
+            setTimeout(openSectionFromHash, 0);
+        });
+    });
+});
 window.addEventListener("hashchange", openSectionFromHash);
 
 // const membershipForm = document.getElementById("membershipForm");
